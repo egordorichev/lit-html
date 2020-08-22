@@ -66,11 +66,19 @@
 			})(),
 
 			printErr: function (text) {
+				if (text.startsWith("wasm streaming compile failed") || text.startsWith("falling back to ArrayBuffer instantiation")) {
+					// Yeah, whatever
+					return;
+				}
+
 				if (arguments.length > 1) {
 					text = Array.prototype.slice.call(arguments).join(' ');
 				}
 
 				console.log(text);
+
+				var element = document.getElementById('output');
+				element.innerHTML += `<span style="color:red;">${text}</span><br>`;
 			},
 
 			canvas: (function () {
