@@ -41,7 +41,7 @@
 
 		if (code != null) {
 			var editor_div = document.getElementById("editor");
-			editor_div.innerHTML = decodeURI(code);
+			editor_div.innerHTML = code;
 		}
 
 		var editor = ace.edit("editor", {
