@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-	<title>Web Lit</title>
+	<title>lit-html</title>
 	<style type="text/css" media="screen">
 		#editor {
 			border-radius: 5px;
@@ -24,6 +24,7 @@
 	</style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.7/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdn.jsdelivr.net/gh/egordorichev/lit-ace/mode-lit.js" type="text/javascript" charset="utf-8"></script>
 <body>
 
 <div id="container">
@@ -36,6 +37,7 @@
 
 	<h5>Output</h5>
 	<div id="output"></div>
+	<h6><a href="https://github.com/egordorichev/lit-html">Fork me on github</a></h6>
 	<script>
 		var code = new URLSearchParams(window.location.search).get("code");
 
@@ -44,16 +46,18 @@
 			editor_div.innerHTML = code;
 		}
 
+
 		var editor = ace.edit("editor", {
 			theme: "ace/theme/monokai",
-			mode: "ace/mode/javascript",
 			maxLines: 30,
 			minLines: 10,
 			wrap: true,
 			autoScrollEditorIntoView: true
 		});
 
-		editor.getSession().setUseWorker(false);
+
+		editor.session.setMode("ace/mode/lit");
+		editor.session.setUseWorker(false);
 		editor.renderer.setScrollMargin(10, 10);
 
 		var Module = {
