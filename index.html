@@ -39,13 +39,22 @@
 	<div id="output"></div>
 	<h6><a href="https://github.com/egordorichev/lit-html">Fork me on github</a></h6>
 	<script>
-		var code = new URLSearchParams(window.location.search).get("code");
+		function get_contents(url, callback) {
+			var request = new XMLHttpRequest();
 
-		if (code != null) {
-			var editor_div = document.getElementById("editor");
-			editor_div.innerHTML = code;
+			request.open('GET', url, true);
+			request.send(null);
+
+			request.onreadystatechange = function () {
+				if (request.readyState === 4 && request.status === 200) {
+					var type = request.getResponseHeader('Content-Type');
+		
+					if (type.indexOf("text") !== 1) {
+						callback(request.responseText);
+					}
+				}
+			}
 		}
-
 
 		var editor = ace.edit("editor", {
 			theme: "ace/theme/monokai",
@@ -55,7 +64,21 @@
 			autoScrollEditorIntoView: true
 		});
 
+		var params = new URLSearchParams(window.location.search);
+		var file = params.get("github");
+		
+		if (file != null) {
+			get_contents(`https://cdn.jsdelivr.net/gh/${file}`, function(content) {
+				editor.setValue(content);
+			});
+		} else {
+			var code = params.get("code");
 
+			if (code != null) {
+				editor.setValue(code);
+			}
+		}
+		
 		editor.session.setMode("ace/mode/lit");
 		editor.session.setUseWorker(false);
 		editor.renderer.setScrollMargin(10, 10);
