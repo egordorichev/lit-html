@@ -70,12 +70,14 @@
 		if (file != null) {
 			get_contents(`https://cdn.jsdelivr.net/gh/${file}`, function(content) {
 				editor.setValue(content);
+				editor.clearSelection();
 			});
 		} else {
 			var code = params.get("code");
 
 			if (code != null) {
 				editor.setValue(code);
+				editor.clearSelection();
 			}
 		}
 		
