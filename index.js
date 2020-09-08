@@ -621,8 +621,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 1928,
-  'maximum': 1928,
+  'initial': 2264,
+  'maximum': 2264,
   'element': 'anyfunc'
 });
 
@@ -1227,11 +1227,11 @@ function updateGlobalBufferAndViews(buf) {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 12432,
+    STACK_BASE = 13232,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5255312,
-    DYNAMIC_BASE = 5255312,
-    DYNAMICTOP_PTR = 12224;
+    STACK_MAX = 5256112,
+    DYNAMIC_BASE = 5256112,
+    DYNAMICTOP_PTR = 13024;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1766,7 +1766,7 @@ var ASM_CONSTS = [];
 
 
 
-// STATICTOP = STATIC_BASE + 11408;
+// STATICTOP = STATIC_BASE + 12208;
 /* global initializers */ /*__ATINIT__.push();*/
 
 
@@ -1777,7 +1777,7 @@ var ASM_CONSTS = [];
 
 
 /* no memory initializer */
-var tempDoublePtr = 12416
+var tempDoublePtr = 13216
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -2223,10 +2223,13 @@ function nullFunc_iiiii(x) { abortFnPtrError(x, 'iiiii'); }
 function nullFunc_iiiiiii(x) { abortFnPtrError(x, 'iiiiiii'); }
 function nullFunc_iiiiiiii(x) { abortFnPtrError(x, 'iiiiiiii'); }
 function nullFunc_iiiiiiiii(x) { abortFnPtrError(x, 'iiiiiiiii'); }
+function nullFunc_iiji(x) { abortFnPtrError(x, 'iiji'); }
 function nullFunc_iijii(x) { abortFnPtrError(x, 'iijii'); }
 function nullFunc_jiii(x) { abortFnPtrError(x, 'jiii'); }
+function nullFunc_jiiii(x) { abortFnPtrError(x, 'jiiii'); }
 function nullFunc_jiji(x) { abortFnPtrError(x, 'jiji'); }
 function nullFunc_jijii(x) { abortFnPtrError(x, 'jijii'); }
+function nullFunc_vi(x) { abortFnPtrError(x, 'vi'); }
 function nullFunc_vii(x) { abortFnPtrError(x, 'vii'); }
 function nullFunc_viii(x) { abortFnPtrError(x, 'viii'); }
 function nullFunc_viiii(x) { abortFnPtrError(x, 'viiii'); }
@@ -2308,6 +2311,61 @@ function invoke_iiiiiiiii(index,a1,a2,a3,a4,a5,a6,a7,a8) {
   }
 }
 
+function invoke_iiji(index,a1,a2,a3,a4) {
+  var sp = stackSave();
+  try {
+    return dynCall_iiji(index,a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_iijii(index,a1,a2,a3,a4,a5) {
+  var sp = stackSave();
+  try {
+    return dynCall_iijii(index,a1,a2,a3,a4,a5);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_jiii(index,a1,a2,a3) {
+  var sp = stackSave();
+  try {
+    return dynCall_jiii(index,a1,a2,a3);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_jijii(index,a1,a2,a3,a4,a5) {
+  var sp = stackSave();
+  try {
+    return dynCall_jijii(index,a1,a2,a3,a4,a5);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_vi(index,a1) {
+  var sp = stackSave();
+  try {
+    dynCall_vi(index,a1);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_vii(index,a1,a2) {
   var sp = stackSave();
   try {
@@ -2373,6 +2431,10 @@ function jsCall_iiiiiiiii(index,a1,a2,a3,a4,a5,a6,a7,a8) {
     return functionPointers[index](a1,a2,a3,a4,a5,a6,a7,a8);
 }
 
+function jsCall_iiji(index,a1,a2,a3) {
+    return functionPointers[index](a1,a2,a3);
+}
+
 function jsCall_iijii(index,a1,a2,a3,a4) {
     return functionPointers[index](a1,a2,a3,a4);
 }
@@ -2381,12 +2443,20 @@ function jsCall_jiii(index,a1,a2,a3) {
     return functionPointers[index](a1,a2,a3);
 }
 
+function jsCall_jiiii(index,a1,a2,a3,a4) {
+    return functionPointers[index](a1,a2,a3,a4);
+}
+
 function jsCall_jiji(index,a1,a2,a3) {
     return functionPointers[index](a1,a2,a3);
 }
 
 function jsCall_jijii(index,a1,a2,a3,a4) {
     return functionPointers[index](a1,a2,a3,a4);
+}
+
+function jsCall_vi(index,a1) {
+    functionPointers[index](a1);
 }
 
 function jsCall_vii(index,a1,a2) {
@@ -2403,7 +2473,7 @@ function jsCall_viiii(index,a1,a2,a3,a4) {
 
 var asmGlobalArg = {};
 
-var asmLibraryArg = { "___assert_fail": ___assert_fail, "___lock": ___lock, "___setErrNo": ___setErrNo, "___syscall140": ___syscall140, "___syscall145": ___syscall145, "___syscall195": ___syscall195, "___syscall221": ___syscall221, "___syscall5": ___syscall5, "___syscall54": ___syscall54, "___unlock": ___unlock, "___wasi_fd_close": ___wasi_fd_close, "___wasi_fd_write": ___wasi_fd_write, "__memory_base": 1024, "__table_base": 0, "_clock": _clock, "_emscripten_get_heap_size": _emscripten_get_heap_size, "_emscripten_longjmp": _emscripten_longjmp, "_emscripten_memcpy_big": _emscripten_memcpy_big, "_emscripten_resize_heap": _emscripten_resize_heap, "_exit": _exit, "_fd_close": _fd_close, "_fd_write": _fd_write, "_llvm_stackrestore": _llvm_stackrestore, "_llvm_stacksave": _llvm_stacksave, "_longjmp": _longjmp, "_time": _time, "abort": abort, "abortOnCannotGrowMemory": abortOnCannotGrowMemory, "abortStackOverflow": abortStackOverflow, "demangle": demangle, "demangleAll": demangleAll, "emscripten_realloc_buffer": emscripten_realloc_buffer, "flush_NO_FILESYSTEM": flush_NO_FILESYSTEM, "getTempRet0": getTempRet0, "invoke_ii": invoke_ii, "invoke_iii": invoke_iii, "invoke_iiii": invoke_iiii, "invoke_iiiii": invoke_iiiii, "invoke_iiiiiii": invoke_iiiiiii, "invoke_iiiiiiii": invoke_iiiiiiii, "invoke_iiiiiiiii": invoke_iiiiiiiii, "invoke_vii": invoke_vii, "invoke_viii": invoke_viii, "invoke_viiii": invoke_viiii, "jsCall_ii": jsCall_ii, "jsCall_iidiiii": jsCall_iidiiii, "jsCall_iii": jsCall_iii, "jsCall_iiii": jsCall_iiii, "jsCall_iiiii": jsCall_iiiii, "jsCall_iiiiiii": jsCall_iiiiiii, "jsCall_iiiiiiii": jsCall_iiiiiiii, "jsCall_iiiiiiiii": jsCall_iiiiiiiii, "jsCall_iijii": jsCall_iijii, "jsCall_jiii": jsCall_jiii, "jsCall_jiji": jsCall_jiji, "jsCall_jijii": jsCall_jijii, "jsCall_vii": jsCall_vii, "jsCall_viii": jsCall_viii, "jsCall_viiii": jsCall_viiii, "jsStackTrace": jsStackTrace, "memory": wasmMemory, "nullFunc_ii": nullFunc_ii, "nullFunc_iidiiii": nullFunc_iidiiii, "nullFunc_iii": nullFunc_iii, "nullFunc_iiii": nullFunc_iiii, "nullFunc_iiiii": nullFunc_iiiii, "nullFunc_iiiiiii": nullFunc_iiiiiii, "nullFunc_iiiiiiii": nullFunc_iiiiiiii, "nullFunc_iiiiiiiii": nullFunc_iiiiiiiii, "nullFunc_iijii": nullFunc_iijii, "nullFunc_jiii": nullFunc_jiii, "nullFunc_jiji": nullFunc_jiji, "nullFunc_jijii": nullFunc_jijii, "nullFunc_vii": nullFunc_vii, "nullFunc_viii": nullFunc_viii, "nullFunc_viiii": nullFunc_viiii, "setTempRet0": setTempRet0, "stackTrace": stackTrace, "table": wasmTable, "tempDoublePtr": tempDoublePtr };
+var asmLibraryArg = { "___assert_fail": ___assert_fail, "___lock": ___lock, "___setErrNo": ___setErrNo, "___syscall140": ___syscall140, "___syscall145": ___syscall145, "___syscall195": ___syscall195, "___syscall221": ___syscall221, "___syscall5": ___syscall5, "___syscall54": ___syscall54, "___unlock": ___unlock, "___wasi_fd_close": ___wasi_fd_close, "___wasi_fd_write": ___wasi_fd_write, "__memory_base": 1024, "__table_base": 0, "_clock": _clock, "_emscripten_get_heap_size": _emscripten_get_heap_size, "_emscripten_longjmp": _emscripten_longjmp, "_emscripten_memcpy_big": _emscripten_memcpy_big, "_emscripten_resize_heap": _emscripten_resize_heap, "_exit": _exit, "_fd_close": _fd_close, "_fd_write": _fd_write, "_llvm_stackrestore": _llvm_stackrestore, "_llvm_stacksave": _llvm_stacksave, "_longjmp": _longjmp, "_time": _time, "abort": abort, "abortOnCannotGrowMemory": abortOnCannotGrowMemory, "abortStackOverflow": abortStackOverflow, "demangle": demangle, "demangleAll": demangleAll, "emscripten_realloc_buffer": emscripten_realloc_buffer, "flush_NO_FILESYSTEM": flush_NO_FILESYSTEM, "getTempRet0": getTempRet0, "invoke_ii": invoke_ii, "invoke_iii": invoke_iii, "invoke_iiii": invoke_iiii, "invoke_iiiii": invoke_iiiii, "invoke_iiiiiii": invoke_iiiiiii, "invoke_iiiiiiii": invoke_iiiiiiii, "invoke_iiiiiiiii": invoke_iiiiiiiii, "invoke_iiji": invoke_iiji, "invoke_iijii": invoke_iijii, "invoke_jiii": invoke_jiii, "invoke_jijii": invoke_jijii, "invoke_vi": invoke_vi, "invoke_vii": invoke_vii, "invoke_viii": invoke_viii, "invoke_viiii": invoke_viiii, "jsCall_ii": jsCall_ii, "jsCall_iidiiii": jsCall_iidiiii, "jsCall_iii": jsCall_iii, "jsCall_iiii": jsCall_iiii, "jsCall_iiiii": jsCall_iiiii, "jsCall_iiiiiii": jsCall_iiiiiii, "jsCall_iiiiiiii": jsCall_iiiiiiii, "jsCall_iiiiiiiii": jsCall_iiiiiiiii, "jsCall_iiji": jsCall_iiji, "jsCall_iijii": jsCall_iijii, "jsCall_jiii": jsCall_jiii, "jsCall_jiiii": jsCall_jiiii, "jsCall_jiji": jsCall_jiji, "jsCall_jijii": jsCall_jijii, "jsCall_vi": jsCall_vi, "jsCall_vii": jsCall_vii, "jsCall_viii": jsCall_viii, "jsCall_viiii": jsCall_viiii, "jsStackTrace": jsStackTrace, "memory": wasmMemory, "nullFunc_ii": nullFunc_ii, "nullFunc_iidiiii": nullFunc_iidiiii, "nullFunc_iii": nullFunc_iii, "nullFunc_iiii": nullFunc_iiii, "nullFunc_iiiii": nullFunc_iiiii, "nullFunc_iiiiiii": nullFunc_iiiiiii, "nullFunc_iiiiiiii": nullFunc_iiiiiiii, "nullFunc_iiiiiiiii": nullFunc_iiiiiiiii, "nullFunc_iiji": nullFunc_iiji, "nullFunc_iijii": nullFunc_iijii, "nullFunc_jiii": nullFunc_jiii, "nullFunc_jiiii": nullFunc_jiiii, "nullFunc_jiji": nullFunc_jiji, "nullFunc_jijii": nullFunc_jijii, "nullFunc_vi": nullFunc_vi, "nullFunc_vii": nullFunc_vii, "nullFunc_viii": nullFunc_viii, "nullFunc_viiii": nullFunc_viiii, "setTempRet0": setTempRet0, "stackTrace": stackTrace, "table": wasmTable, "tempDoublePtr": tempDoublePtr };
 // EMSCRIPTEN_START_ASM
 var asm =Module["asm"]// EMSCRIPTEN_END_ASM
 (asmGlobalArg, asmLibraryArg, buffer);
@@ -2577,6 +2647,12 @@ var dynCall_iiiiiiiii = Module["dynCall_iiiiiiiii"] = function() {
   return Module["asm"]["dynCall_iiiiiiiii"].apply(null, arguments)
 };
 
+var dynCall_iiji = Module["dynCall_iiji"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_iiji"].apply(null, arguments)
+};
+
 var dynCall_iijii = Module["dynCall_iijii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -2589,6 +2665,12 @@ var dynCall_jiii = Module["dynCall_jiii"] = function() {
   return Module["asm"]["dynCall_jiii"].apply(null, arguments)
 };
 
+var dynCall_jiiii = Module["dynCall_jiiii"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_jiiii"].apply(null, arguments)
+};
+
 var dynCall_jiji = Module["dynCall_jiji"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -2599,6 +2681,12 @@ var dynCall_jijii = Module["dynCall_jijii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_jijii"].apply(null, arguments)
+};
+
+var dynCall_vi = Module["dynCall_vi"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_vi"].apply(null, arguments)
 };
 
 var dynCall_vii = Module["dynCall_vii"] = function() {
